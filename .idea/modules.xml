@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/cronjob-demo/cronjob-demo.iml" filepath="$PROJECT_DIR$/cronjob-demo/cronjob-demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/k8s-demo.iml" filepath="$PROJECT_DIR$/.idea/k8s-demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springboot-demo/springboot-demo.iml" filepath="$PROJECT_DIR$/springboot-demo/springboot-demo.iml" />
     </modules>
   </component>
 </project>
