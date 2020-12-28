@@ -3,11 +3,12 @@ pipeline{
 	agent any
 	environment {
 		REPOSITORY="https://github.com/lazy-r/k8s-demo.git"
-		SERVICE_DIR="hello"
+		SERVICE_DIR=PROJECT_NAME
 		HARBOR_HOST="172.19.241.66"
 		IMAGE_NAME="172.19.241.66/test/hello"
         HARBOR_USERNAME = "admin"
         HARBOR_PASSWORD= "123456"
+        PROJECT_NAME = "springboot-demo"
 	}
 	stages {
         stage('PULL CODE'){
@@ -23,7 +24,7 @@ pipeline{
             steps{
                 echo "start building maven*****************************************"
 
-                dir("hello"){
+                dir(PROJECT_NAME){
                     sh "ls -l"
                     sh "mvn -U -am clean package"
                     script {
@@ -40,7 +41,7 @@ pipeline{
         stage('BUILD IMAGE'){
             steps{
                 echo "start building image*****************************************"
-                dir("hello"){
+                dir(PROJECT_NAME){
                     sh "ls -l"
                     sh "docker build -t ${IMAGE_NAME}:${IMAGE_VERSION} ."
                 }
@@ -52,7 +53,7 @@ pipeline{
         stage('PUSH IMAGE'){
             steps{
                 echo "start pushing image*****************************************"
-                dir("hello"){
+                dir(PROJECT_NAME){
                     sh "docker login -u ${HARBOR_USERNAME} -p ${HARBOR_PASSWORD} ${HARBOR_HOST}"
                     sh "docker push ${IMAGE_NAME}:${IMAGE_VERSION}"
                 }
@@ -64,7 +65,7 @@ pipeline{
         stage('UPDATE k8s.yaml'){
             steps{
                 echo "start updating k8s.yaml*****************************************"
-                dir("hello"){
+                dir(PROJECT_NAME){
                     sh "ls -l"
                     sh "sed -i 's/<IMAGE_VERSION>/${IMAGE_VERSION}/' k8s.yaml"
                     sh "cat k8s.yaml"
@@ -76,7 +77,7 @@ pipeline{
         stage('DEPLOY'){
             steps{
                 echo "start deploying*****************************************"
-                dir("hello"){
+                dir(PROJECT_NAME){
                     sh "ls -l"
                     sh "kubectl apply -f k8s.yaml"
                 }
