@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
-    @RequestMapping("/hello")
-    public String hello(@RequestParam String name){
-        return "<h1 align='center'><span style='color: red'>"+name+"</span>,你好</h1>";
+    @RequestMapping("/")
+    public String hello(@RequestParam(defaultValue = "游客") String name){
+        return "<h1 align='center'><span style='color: blue'>"+name+"</span>,你好（这是版本1.0）</h1>";
     }
 }

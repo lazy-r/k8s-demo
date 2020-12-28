@@ -1,0 +1,53 @@
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello
+spec:
+  selector:
+    matchLabels:
+      app: hello
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello
+    spec:
+      nodeSelector:
+        node: slave2
+      containers:
+        - name: hello
+          imagePullPolicy: Always
+          image: 172.19.241.66/test/hello:<IMAGE_VERSION>
+          ports:
+            - containerPort: 9090
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 9090
+  selector:
+    app: hello
+  type: ClusterIP
+
+---
+#ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: hello
+spec:
+  rules:
+    - host: hello.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: hello
+              servicePort: 80

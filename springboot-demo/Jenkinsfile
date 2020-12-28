@@ -1,0 +1,88 @@
+#!/groovy
+pipeline{
+	agent any
+	environment {
+		REPOSITORY="https://github.com/lazy-r/k8s-demo.git"
+		SERVICE_DIR="hello"
+		HARBOR_HOST="172.19.241.66"
+		IMAGE_NAME="172.19.241.66/test/hello"
+        HARBOR_USERNAME = "admin"
+        HARBOR_PASSWORD= "123456"
+	}
+	stages {
+        stage('PULL CODE'){
+            steps{
+                echo "start pulling code*****************************************"
+                git "${REPOSITORY}"
+                echo "finish pulling code*****************************************"
+
+            }
+
+        }
+        stage('BUILD MAVEN'){
+            steps{
+                echo "start building maven*****************************************"
+
+                dir("hello"){
+                    sh "ls -l"
+                    sh "mvn -U -am clean package"
+                    script {
+                        time = sh(returnStdout: true, script: 'date "+%Y%m%d%H%M"').trim()
+                        git_version = sh(returnStdout: true, script: 'git log -1 --pretty=format:"%h"').trim()
+                        IMAGE_VERSION = time+"_"+git_version
+                    }
+                }
+                echo "finish building maven*****************************************"
+
+            }
+
+        }
+        stage('BUILD IMAGE'){
+            steps{
+                echo "start building image*****************************************"
+                dir("hello"){
+                    sh "ls -l"
+                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_VERSION} ."
+                }
+                echo "finish building image*****************************************"
+
+            }
+        }
+
+        stage('PUSH IMAGE'){
+            steps{
+                echo "start pushing image*****************************************"
+                dir("hello"){
+                    sh "docker login -u ${HARBOR_USERNAME} -p ${DOCKER_REGISTRY_PASSWORD} ${HARBOR_HOST}"
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_VERSION}"
+                }
+                echo "finish pushing image*****************************************"
+            }
+
+        }
+
+        stage('UPDATE k8s.yaml'){
+            steps{
+                echo "start updating k8s.yaml*****************************************"
+                dir("hello"){
+                    sh "ls -l"
+                    sh "sed -i 's/<IMAGE_VERSION>/${IMAGE_VERSION}/' k8s.yaml"
+                    sh "cat k8s.yaml"
+                }
+                echo "finish updating k8s.yaml*****************************************"
+
+            }
+        }
+        stage('DEPLOY'){
+            steps{
+                echo "start deploying*****************************************"
+                dir("hello"){
+                    sh "ls -l"
+                    sh "kubectl apply -f k8s.yaml"
+                }
+                echo "finish deploying*****************************************"
+
+            }
+        }
+	}
+}
