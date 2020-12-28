@@ -13,7 +13,7 @@ pipeline{
         stage('PULL CODE'){
             steps{
                 echo "start pulling code*****************************************"
-                git  "${REPOSITORY}"
+                git "${REPOSITORY}"
                 echo "finish pulling code*****************************************"
 
             }
