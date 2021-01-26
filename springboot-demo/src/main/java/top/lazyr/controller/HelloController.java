@@ -9,6 +9,6 @@ public class HelloController {
 
     @RequestMapping("/")
     public String hello(@RequestParam(defaultValue = "游客") String name){
-        return "<h1 align='center'><span style='color: blue'>"+name+"</span>,你好（这是版本1.0）</h1>";
+        return "<h1 align='center'><span style='color: blue'>"+name+"</span>,你好（这是版本2.0）</h1>";
     }
 }
